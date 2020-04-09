@@ -34,7 +34,7 @@ export default {
                 { root: true }
             ).then(res => commit('create', res.data))
              .catch(err => err)
-             .finally(res => commit('destroy'))
+             .finally(() => commit('destroy'))
         }
     }
 

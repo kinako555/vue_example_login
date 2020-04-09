@@ -1,4 +1,6 @@
 <template>
+  <div class="login">
+    <h1>ログイン</h1>
      <section class="hero is-light is-fullheight">
          <div class="hero-body">
              <div class="container has-text-centered">
@@ -6,12 +8,38 @@
                      <div class="box">
                          <div class="field">
                             <div class="control">
-                                <input class="input is-large" type="email" placeholder="Eメール" v-model="email" autofocus="" v-validate="'required|email'" name="email">
+                              <!--
+                                <input class="input is-large" 
+                                       type="email" 
+                                       placeholder="Eメール" 
+                                       v-model="email" 
+                                       autofocus="" 
+                                       v-validate="'required|email'" 
+                                       name="email">
+                                -->
+                                <input class="input is-large" 
+                                       type="email" 
+                                       placeholder="Eメール" 
+                                       v-model="email" 
+                                       autofocus="" 
+                                       name="email">
                             </div>
                         </div>
                         <div class="field">
                             <div class="control">
-                                <input class="input is-large" type="password" placeholder="パスワード" v-model="password" v-validate="'required|min:6|max:20'" maxlength="20" name="password">
+                                <!--
+                                <input class="input is-large" 
+                                       type="password" 
+                                       placeholder="パスワード" 
+                                       v-model="password" 
+                                       v-validate="'required|min:6|max:20'" 
+                                       maxlength="20" name="password">
+                                -->
+                                <input class="input is-large" 
+                                       type="password" 
+                                       placeholder="パスワード" 
+                                       v-model="password" 
+                                       maxlength="20" name="password">
                             </div>
                         </div>
                     </div>
@@ -21,19 +49,49 @@
                             ログインしたままにする
                         </label>
                     </div>
-                    <button class="button is-block is-info is-large is-fullwidth" @click="login()" :disabled="!isValidated" >ログイン</button>
+                    <button class="button is-block is-info is-large is-fullwidth" 
+                            @click="login()" 
+                            :disabled="!isValidated" >ログイン</button>
                 </div>
+                <p><router-link to="/sign_up">ユーザー登録</router-link></p>      
                 <p class="has-text-grey"><a href="..">パスワードを忘れた方はこちら</a></p>
             </div>
          </div>
      </section>
+  </div>
 </template>
 
 <script>
 export default {
   name: 'Login',
+  data() {
+    return {
+      email: '',
+      password: ''
+    }
+  },
   props: {
-    msg: String
+  },
+  method: {
+    login() {
+      this.$store.dispatch('auth/create', {'user': { email: this.email, password: this.password }})
+    }
+  },
+  computed: {
+    //ログインボタンvalidated
+    isValidated() {
+      //return Object.keys(this.fields).every(k => this.fields[k].validated) && 
+      //       Object.keys(this.fields).every(k => this.fields[k].valid)
+      return true
+    },
+    token() {
+      return this.$store.state.auth.token
+    }
+  },
+  watch: {
+    token () {
+      this.$router.push('/') // ログイン後画面移行
+    }
   }
 }
 </script>
