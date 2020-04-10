@@ -6,27 +6,33 @@
              <div class="container has-text-centered">
                  <div class="column is-4 is-offset-4">
                      <div class="box">
-                       <form novalidate=true>
+                       <ValidationObserver ref="observer" tag="form" @submit.prevent="submit">
                          <div class="field">
                             <div class="control">
                               <ValidationProvider rules="email|required" v-slot="{ errors }">
                                 <input class="input is-large" 
                                        type="email" 
                                        placeholder="Eメール" 
-                                       v-model="email" 
+                                       v-model="user.email" 
                                        name="email">
-                                <span class="md-error">{{ errors[0] }}</span>
+                                <div v-show="submitClicked">
+                                    <span class="md-error">{{ errors[0] }}</span>
+                                </div>
                               </ValidationProvider>
                             </div>
-                        </div>
-                        <div class="field">
+                          </div>
+                          <div class="field">
                             <div class="control">
                                 <ValidationProvider rules="min:6|required" vid="password" v-slot="{ errors }">
                                   <input class="input is-large"
                                          type="password" 
-                                         v-model="password" 
+                                         v-model="user.password"
+                                         minlength="6"
+                                         maxlength="15"
                                          placeholder="パスワード" >
-                                         <span class="md-error">{{ errors[0] }}</span>
+                                         <div v-show="submitClicked">
+                                            <span class="md-error">{{ errors[0] }}</span>
+                                         </div>
                                 </ValidationProvider>
                             </div>
                         </div>
@@ -35,16 +41,19 @@
                                 <ValidationProvider rules="confirmed:password|required" v-slot="{ errors }">
                                   <input class="input is-large"
                                          type="password" 
-                                         v-model="confirmation"
+                                         v-model="user.confirmation"
+                                         maxlength="15"
                                          placeholder="パスワード(確認)" >
-                                         <span class="md-error">{{ errors[0] }}</span>
+                                         <div v-show="submitClicked">
+                                            <span class="md-error">{{ errors[0] }}</span>
+                                         </div>
                                 </ValidationProvider>
                             </div>
                         </div>
-                        </form>
+                      </ValidationObserver>
                     </div>             
                     <button class="button is-block is-info is-large is-fullwidth" 
-                            @click="signUp()">ユーザー作成</button>
+                            v-on:click="submit">ユーザー作成</button>
                 </div>
             </div>
          </div>
@@ -53,57 +62,38 @@
 </template>
 
 <script>
+import httpSignUP from '@/http/sign-up'
 
 export default {
   name: 'SignUp',
   data() {
     return {
-      email: '',
-      password: '',
-      confirmation: ''
+      user: {
+        email: '',
+        password: '',
+        confirmation: ''
+      },
+      submitClicked: false
     }
   },
   props: {
   },
-  method: {
-    signUp() {
-      //this.$store.dispatch('auth/create', {'user': { email: this.email, password: this.password }})
-      return true
-    },
-    mdFieldClass(errors) {
-      // vue-materialのバリデーションエラー時のクラスを付加
-      return {
-        'md-invalid': errors.length > 0
+  methods: {
+    submit : async function() {
+      this.submitClicked = true;
+      const isValid = await this.$refs.observer.validate();
+      if (!isValid) return;
+      const isSuccess = await httpSignUP.signUp(this.user);
+      if (!isSuccess) {
+        alert('処理に失敗しました');
+        return
       }
-    }
-  },
-  computed: {
-    token() {
-      return this.$store.state.auth.token
-    }
-  },
-  watch: {
-    token () {
-      this.$router.push('/') // ログイン後画面移行
-    }
+      this.$router.push('/login');
+    },
   }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
 </style>

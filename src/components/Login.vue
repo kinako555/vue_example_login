@@ -8,38 +8,23 @@
                      <div class="box">
                          <div class="field">
                             <div class="control">
-                              <!--
                                 <input class="input is-large" 
                                        type="email" 
                                        placeholder="Eメール" 
                                        v-model="email" 
                                        autofocus="" 
-                                       v-validate="'required|email'" 
-                                       name="email">
-                                -->
-                                <input class="input is-large" 
-                                       type="email" 
-                                       placeholder="Eメール" 
-                                       v-model="email" 
-                                       autofocus="" 
+                                       maxlength="50"
                                        name="email">
                             </div>
                         </div>
                         <div class="field">
                             <div class="control">
-                                <!--
                                 <input class="input is-large" 
                                        type="password" 
                                        placeholder="パスワード" 
                                        v-model="password" 
-                                       v-validate="'required|min:6|max:20'" 
-                                       maxlength="20" name="password">
-                                -->
-                                <input class="input is-large" 
-                                       type="password" 
-                                       placeholder="パスワード" 
-                                       v-model="password" 
-                                       maxlength="20" name="password">
+                                       maxlength="20" 
+                                       name="password">
                             </div>
                         </div>
                     </div>
@@ -78,12 +63,6 @@ export default {
     }
   },
   computed: {
-    //ログインボタンvalidated
-    isValidated() {
-      //return Object.keys(this.fields).every(k => this.fields[k].validated) && 
-      //       Object.keys(this.fields).every(k => this.fields[k].valid)
-      return true
-    },
     token() {
       return this.$store.state.auth.token
     }

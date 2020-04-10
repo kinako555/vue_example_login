@@ -1,9 +1,7 @@
 import Vue from 'vue'
-import { ValidationProvider, extend } from 'vee-validate';
+import { ValidationProvider,ValidationObserver, extend } from 'vee-validate';
 import { required, email, confirmed, min } from 'vee-validate/dist/rules';
 
-
-Vue.component('ValidationProvider', ValidationProvider);
 extend('required', {
     ...required,
     message: '必須項目です'
@@ -18,10 +16,15 @@ extend('confirmed', {
 });
 extend('min', {
     ...min,
-    params: ['min'],
+    params: ['length'],
     message: (fieldName, placeholders) => { 
-        return `${placeholders.min}文字以上入力してください` 
+        return `${placeholders.length}文字以上入力してください` 
     }
 });
 
-export default{}
+export default {
+    component: [
+        Vue.component('ValidationProvider', ValidationProvider),
+        Vue.component('ValidationObserver', ValidationObserver)
+    ]
+}
