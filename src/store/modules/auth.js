@@ -1,41 +1,49 @@
 export default {
     namespaced: true,
     state: {
-        tenant: '',
-        userId: '',
-        token: ''
+        accessToken: '',
+        client: '',
+        expiry: '',
+        uid: '',
     },
     mutations: {
-        create(state, data) {
-            state.tenant = ''
-            state.userId = data.user_id
-            state.token = data.token
+        create(state, payload) {
+            state.accessToken  = payload["access-token"];
+            state.client       = payload["client"];
+            state.expiry       = payload["expiry"];
+            state.uid          = payload["uid"];
+            
         },
         destroy(state) {
-            state.tenant = ''
-            state.userId = ''
-            state.token = ''
+            Object.keys(state).forEach(function(key) {
+                state[key] = '';
+              });
         }
     },
     actions: {
-        // 他moduleをコールcoalする際、第3引数で{root: true}にしないとエラーになる
-        create({ commit, dispatch }, data) {
+        // Login
+        create({ commit, dispatch }, {email, password}) {
+            const data = {
+                email   : email,
+                password: password
+            }
             dispatch(
                 'http/post',
-                { url: '/auth', data, error: 'message.unauthorized' },
+                { url: '/auth/sign_in', data, error: 'message.unauthorized' },
                 { root: true }
-            ).then(res => commit('create', res.data))
-             .catch(err => err)
+            ).then(res => commit('create', res.headers))
+             .catch(err => err);
         },
-        destroy({ commit, dispatch }, data) {
-            dispatch(
+        // Logout
+        async destroy({ commit, dispatch }, data) {
+            await dispatch(
                 'http/delete',
-                { url: '/auth', data },
+                { url: '/auth/sign_out', data },
                 { root: true }
-            ).then(res => commit('create', res.data))
-             .catch(err => err)
-             .finally(() => commit('destroy'))
+            ).catch(err => err)
+             .finally(() => {
+                 commit('destroy');
+                });
         }
     }
-
 }

@@ -62,7 +62,6 @@
 </template>
 
 <script>
-import httpSignUP from '@/http/sign-up'
 
 export default {
   name: 'SignUp',
@@ -79,17 +78,38 @@ export default {
   props: {
   },
   methods: {
-    submit : async function() {
+    submit: async function() {
       this.submitClicked = true;
       const isValid = await this.$refs.observer.validate();
       if (!isValid) return;
-      const isSuccess = await httpSignUP.signUp(this.user);
+      //let isSuccess = await httpSignUP.signUp(this.user);
+      const isSuccess = await this.signUp();
       if (!isSuccess) {
-        alert('処理に失敗しました');
+        alert('すでに登録済みのアドレスである\nまたは通信に失敗しました');
         return
       }
+      console.log('signUp');
       this.$router.push('/login');
     },
+    signUp: async function() {
+      let formData = this.createFormData();
+      let isSuccess;
+      this.$store.dispatch('http/post', { url: '/auth', data: formData, error: '' })
+          .then(res => {
+              isSuccess = res.status == '200';
+            })
+          .catch(err =>{
+            console.log(err);
+            isSuccess = false;
+          });
+      return isSuccess;
+    },
+    createFormData: function() {
+      let rtnData = new FormData();
+      rtnData.append('email', this.user.email);
+      rtnData.append('password', this.user.password);
+      return rtnData;
+    }
   }
 }
 </script>

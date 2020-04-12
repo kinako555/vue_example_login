@@ -11,7 +11,7 @@
                                 <input class="input is-large" 
                                        type="email" 
                                        placeholder="Eメール" 
-                                       v-model="email" 
+                                       v-model="user.email" 
                                        autofocus="" 
                                        maxlength="50"
                                        name="email">
@@ -22,7 +22,7 @@
                                 <input class="input is-large" 
                                        type="password" 
                                        placeholder="パスワード" 
-                                       v-model="password" 
+                                       v-model="user.password" 
                                        maxlength="20" 
                                        name="password">
                             </div>
@@ -35,8 +35,7 @@
                         </label>
                     </div>
                     <button class="button is-block is-info is-large is-fullwidth" 
-                            @click="login()" 
-                            :disabled="!isValidated" >ログイン</button>
+                            v-on:click="submit">ログイン</button>
                 </div>
                 <p><router-link to="/sign_up">ユーザー登録</router-link></p>      
                 <p class="has-text-grey"><a href="..">パスワードを忘れた方はこちら</a></p>
@@ -51,25 +50,27 @@ export default {
   name: 'Login',
   data() {
     return {
-      email: '',
-      password: ''
+      user: {
+        email: '',
+        password: ''
+      }
     }
   },
   props: {
   },
-  method: {
-    login() {
-      this.$store.dispatch('auth/create', {'user': { email: this.email, password: this.password }})
+  methods: {
+    submit: function() {
+      this.$store.dispatch('auth/create', this.user);
     }
   },
   computed: {
-    token() {
-      return this.$store.state.auth.token
+    token: function() {
+      return this.$store.state.auth.accessToken;
     }
   },
   watch: {
     token () {
-      this.$router.push('/') // ログイン後画面移行
+      this.$router.push('/after_login') // 一旦ここ
     }
   }
 }
@@ -77,18 +78,4 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
 </style>
